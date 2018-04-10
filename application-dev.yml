@@ -1,0 +1,73 @@
+security:
+  user:
+    name: user
+    password: ${MONITOR_SERVER_PASSWORD:admin}
+spring:
+  cloud:
+    config:
+      label: master
+      server:
+        default-application-name: util-server
+        git:
+          uri: http://git.fengqun.ltd/luomingjun/fq-ltd/fq-config-repo/
+          search-paths: repo
+          username: luomingjun
+          password: 123456
+  rabbitmq:
+    host: 10.45.0.21
+    port: 5672
+    username: admin
+    password: admin
+  zipkin:
+    enabled: true
+  sleuth:
+    sampler:
+      percentage: 1
+eureka:
+    instance:
+       hostname: ${spring.cloud.client.ipAddress}
+       preferIpAddress: true
+       instance-id: ${spring.cloud.client.ipAddress}:${server.port}
+       # lease-renewal-interval-in-seconds: 5      # 心跳时间，即服务续约间隔时间（缺省为30s）
+       # lease-expiration-duration-in-seconds: 10  # 发呆时间，即服务续约到期时间（缺省为90s
+       statusPageUrlPath: ${management.contextPath}/info
+       healthCheckUrlPath: ${management.contextPath}/health
+       metadataMap:
+             instanceId: ${spring.application.name}:${random.value}
+       home-page-url-path: /
+        # docker 部署开启
+#        prefer-ip-address: true
+#        ip-address: 127.0.0.1
+    client:
+        healthcheck:
+          enabled: true                           # 开启健康检查（依赖spring-boot-starter-actuator）
+        serviceUrl:
+          defaultZone: http://localhost:8761/eureka/
+
+ribbon:
+  eureka:
+    enabled: true
+  ReadTimeout: 100000 # 设置读取超时时间
+  ConnectTimeout: 100000 # 设置连接超时时间
+  MaxAutoRetries: 0 # 对当前实例的重试次数
+  MaxAutoRetriesNextServer: 1 # 切换实例的重试次数
+  OkToRetryOnAllOperations: false # 对所有操作请求都进行重试
+
+#请求和响应GZIP压缩支持
+feign:
+  httpclient:
+    enabled: false
+  okhttp:
+    enabled: true
+  hystrix:
+    enabled: true
+  compression:
+    request:
+      enabled: true
+      mime-types: text/xml,application/xml,application/json
+      min-request-size: 2048
+    response:
+      enabled: true
+
+logging:
+    config: classpath:logback-spring.xml
